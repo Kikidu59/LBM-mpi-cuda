@@ -1,0 +1,45 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  mpi-matches-serial:
+    name: MPI matches serial (bit for bit)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install MPI and HDF5
+        run: sudo apt-get update && sudo apt-get install -y libopenmpi-dev openmpi-bin libhdf5-dev
+      - name: Build and compare
+        env:
+          HDF5_ROOT: /usr/lib/x86_64-linux-gnu/hdf5/serial
+          MPIRUN: mpirun --oversubscribe
+        run: tests/check_mpi_matches_serial.sh
+
+  cuda-build:
+    name: CUDA compiles (SoA and AoS)
+    runs-on: ubuntu-latest
+    container: nvidia/cuda:12.4.1-devel-ubuntu22.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build SoA
+        run: make -C cuda
+      - name: Build AoS
+        run: make -C cuda clean && make -C cuda LAYOUT=AOS
+
+  figures:
+    name: Figures regenerate from the CSVs
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install plotting dependencies
+        run: pip install matplotlib pandas numpy
+      - name: Run every plotting script
+        working-directory: plotting
+        run: for s in plot_*.py; do python "$s"; done

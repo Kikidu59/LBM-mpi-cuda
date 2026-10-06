@@ -1,0 +1,34 @@
+# Build artifacts
+*.o
+serial/lbm
+mpi/lbm_mpi
+cuda/lbm_cuda
+
+# Solver output
+out/
+probe*.csv
+*.gif
+gmon.out
+analysis.txt
+
+# Slurm logs
+*.out
+
+# Python
+__pycache__/
+*.py[cod]
+
+# LaTeX build files (the compiled PDFs are committed)
+*.aux
+*.log
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+*.nav
+*.snm
+*.toc
+*.vrb
+
+# OS / editors
+.DS_Store
+.vscode/
